@@ -1,0 +1,9 @@
+# Files
+*.iml
+*.DS_Store
+
+# Folders
+out/
+target/
+.idea/
+data/
