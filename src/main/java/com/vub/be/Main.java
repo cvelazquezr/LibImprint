@@ -278,7 +278,7 @@ public class Main {
     }
 
     public static void main(String[] args) throws Exception {
-        String projectName  = "/Users/kmilo/Dev/PhD/ScrapyScrap/results/lucastheisen/httpcomponents";
+        String projectName  = "project";
         ArrayList<String> dependencies = pomDependencies(pomLocations(projectName));
 
         for (String dependency : dependencies) {
