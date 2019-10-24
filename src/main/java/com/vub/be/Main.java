@@ -18,6 +18,7 @@ import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import org.apache.commons.cli.*;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
@@ -183,8 +184,14 @@ public class Main {
         String artifactId = dependencySplitted[1];
         String version = dependencySplitted[2];
 
+        // Creating folders if ot doesnt exist
+        File ghostFolder = new File("data/ghostProcessing");
+        if (!ghostFolder.exists()) {
+            ghostFolder.mkdirs();
+        }
+
         // Writing a ghost POM file
-        PrintWriter pw = new PrintWriter(new File("data/ghostProcessing/pom.xml"));
+        PrintWriter pw = new PrintWriter(new File(ghostFolder.getPath() + "/pom.xml"));
         String textBefore = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
                 "<project xmlns=\"http://maven.apache.org/POM/4.0.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" " +
                 "xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd\">" +
@@ -264,12 +271,16 @@ public class Main {
 
                     lines.add(numberObject);
                 }
-                classObject.put("lines", lines);
+                classObject.putPOJO("lines", lines);
                 arrayNode.add(classObject);
             }
 
-            String jsonFile = String.format("data/usages/%s.json", dependency.replaceAll(" ", "_"));
-            mapper.writeValue(new File(jsonFile), arrayNode);
+            File usagesFolder = new File("data/usages");
+            if (!usagesFolder.exists())
+                usagesFolder.mkdir();
+
+            String jsonFile = String.format("%s/%s.json", usagesFolder.getPath(), dependency.replaceAll(" ", "_"));
+            mapper.writerWithDefaultPrettyPrinter().writeValue(new File(jsonFile), arrayNode);
 
             fileReader.close();
         } else {
@@ -278,7 +289,31 @@ public class Main {
     }
 
     public static void main(String[] args) throws Exception {
-        String projectName  = "project";
+        Options options = new Options();
+
+        // Source code of the project in analysis
+        Option sourceInput = new Option("i",
+                "input",
+                true,
+                "Maven-based project in analysis");
+
+        sourceInput.setRequired(true);
+        options.addOption(sourceInput);
+
+        CommandLineParser parser = new DefaultParser();
+        HelpFormatter formatter = new HelpFormatter();
+        CommandLine cmd = null;
+
+        try {
+            cmd = parser.parse(options, args);
+        } catch (ParseException e) {
+            System.out.println(e.getMessage());
+            formatter.printHelp("utility-name", options);
+
+            System.exit(1);
+        }
+
+        String projectName = cmd.getOptionValue("input");
         ArrayList<String> dependencies = pomDependencies(pomLocations(projectName));
 
         for (String dependency : dependencies) {
