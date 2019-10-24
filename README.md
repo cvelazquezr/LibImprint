@@ -1,4 +1,4 @@
-##LibImprint
+## LibImprint
 The goal of this project is the exploration of Maven-based projects through the analysis of the libraries specified in
 the configuration file e.g.(POM file). Basically, this project parse the POM(s) file(s) extracting the dependencies in
 it. Later on, for each dependency computes the usages present in the source code files of the project. Finally, the tool
