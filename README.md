@@ -21,13 +21,21 @@ To use the tool through the command line you can execute the second `jar` file:
 ```
 java -jar target/libImprint-0.1-jar-with-dependencies.jar -i project/
 ```
-Only Maven-based projects with POM files can be analyzed.
+
+Another possible option is the analysis of only one library in the dependencies:
+```
+java -jar target/libImprint-0.1-jar-with-dependencies.jar -i project/ -l groupId artifactId version
+```
+For this option to be successfully executed, make sure that the metadata of the library is in agreement with the
+information described in the POM file.
+
+Note: Only Maven-based projects with POM files can be analyzed.
 
 #### Output description
 After running the tool in an specific project, you should have a folder `data` with the following structure:
 ```
 data:
----- ghostprocessing
+---- ghostProcessing
 ---- usages
 ```
 Inside the `usages` folder are located JSON files for each dependency of the project. Each file is structured with the

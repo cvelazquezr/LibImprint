@@ -3,6 +3,7 @@ package com.vub.be;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.sun.javafx.scene.control.behavior.OptionalBoolean;
 import com.vub.be.runner.Runner;
 import com.vub.be.utils.Node;
 import org.apache.bcel.classfile.ClassParser;
@@ -291,14 +292,24 @@ public class Main {
     public static void main(String[] args) throws Exception {
         Options options = new Options();
 
-        // Source code of the project in analysis
-        Option sourceInput = new Option("i",
-                "input",
-                true,
-                "Maven-based project in analysis");
+        // Path of the project in analysis
+        Option sourceInput = Option.builder("i")
+                .longOpt("input")
+                .required(true)
+                .hasArg()
+                .desc("Maven-based project in analysis")
+                .build();
 
-        sourceInput.setRequired(true);
+        // Optional library metadata information
+        Option libraryAnalysis = Option.builder("l")
+                .longOpt("library")
+                .required(false)
+                .hasArgs()
+                .desc("Specific library to analyze")
+                .build();
+
         options.addOption(sourceInput);
+        options.addOption(libraryAnalysis);
 
         CommandLineParser parser = new DefaultParser();
         HelpFormatter formatter = new HelpFormatter();
@@ -314,9 +325,16 @@ public class Main {
         }
 
         String projectName = cmd.getOptionValue("input");
+        String[] library = cmd.getOptionValues("library");
+
         ArrayList<String> dependencies = pomDependencies(pomLocations(projectName));
 
-        for (String dependency : dependencies) {
+        if (library == null) {
+            for (String dependency : dependencies) {
+                processDependencies(projectName, dependency);
+            }
+        } else {
+            String dependency = String.join(" ", library);
             processDependencies(projectName, dependency);
         }
     }
