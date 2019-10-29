@@ -26,8 +26,13 @@ Another possible option is the analysis of only one library in the dependencies:
 ```
 java -jar target/libImprint-0.1-jar-with-dependencies.jar -i project/ -l groupId artifactId version
 ```
-For this option to be successfully executed, make sure that the metadata of the library is in agreement with the
-information described in the POM file.
+or
+```
+java -jar target/libImprint-0.1-jar-with-dependencies.jar -i project/ -l groupId artifactId
+```
+For both examples, make sure the metadata of the library is in agreement with the information described in the POM(s) 
+file(s). In the case of the second example, the version of the library will be inferred by matching `groupId` and
+`artifactId` with the current dependencies of the project in analysis.
 
 Note: Only Maven-based projects with POM files can be analyzed.
 
