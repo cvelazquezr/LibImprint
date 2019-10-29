@@ -289,6 +289,16 @@ public class Main {
         }
     }
 
+    public static String getVersion(String library, ArrayList<String> dependencies) {
+        for (String dependency : dependencies) {
+            if (dependency.startsWith(library)) {
+                String[] splittedDependency = dependency.split(" ");
+                return  splittedDependency[2];
+            }
+        }
+        return "";
+    }
+
     public static void main(String[] args) throws Exception {
         Options options = new Options();
 
@@ -335,7 +345,20 @@ public class Main {
             }
         } else {
             String dependency = String.join(" ", library);
-            processDependencies(projectName, dependency);
+            if (library.length == 1) {
+                System.out.println("Only one part of the metadata was passed.");
+                System.out.println("Please, pass library arguments in either of the forms:\ngroupId artifactId\ngroupId artifactId version");
+            } else if (library.length == 2) {
+                System.out.println("Inferring the version assuming that groupId and artifactId were passed");
+                String version = getVersion(String.join(" ", library), dependencies);
+                if (version.isEmpty()) {
+                    System.out.println("Not version found. Check the metadata you passed is correct.");
+                } else {
+                    processDependencies(projectName, dependency + " " + version);
+                }
+            } else {
+                processDependencies(projectName, dependency);
+            }
         }
     }
 }
